@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Get these from Supabase dashboard
 const supabaseUrl = 'https://mxujxqkzqghxpiknkcso.supabase.co'; // Your project URL
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY'; // MUST replace with the NEXT_PUBLIC_SUPABASE_ANON_KEY (from API settings)
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14dWp4cWt6cWdoeHBpa25rY3NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NDU2NzgsImV4cCI6MjA4OTIyMTY3OH0.8FAnPMsQ_8ziojxyV0fh4Oj3MzhBYaYF2lZdGb1tnFc';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
