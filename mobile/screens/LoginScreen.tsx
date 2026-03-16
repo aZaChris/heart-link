@@ -13,7 +13,7 @@ export default function LoginScreen() {
   React.useEffect(() => {
     GoogleSignin.configure({
       scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'],
-      webClientId: 'YOUR_WEB_CLIENT_ID_HERE.apps.googleusercontent.com', // Must be populated from Google Cloud
+      webClientId: '995970422928-3693cpoksobtohqjm7ckirjhal41kkqs.apps.googleusercontent.com',
     });
   }, []);
 
