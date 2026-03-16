@@ -4,12 +4,14 @@ import * as Linking from 'expo-linking';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { supabase } from '../lib/supabase';
 
-// Initialize NFC
-try {
-  NfcManager.start();
-} catch (e) {
-  console.log('NFC Manager already started or error', e);
-}
+// Initialize NFC safely
+NfcManager.isSupported().then((supported) => {
+  if (supported) {
+    NfcManager.start();
+  } else {
+    console.log('NFC not supported on this device');
+  }
+});
 
 export default function HomeScreen({ route, navigation }: any) {
   const [data, setData] = useState<string | null>(null);
