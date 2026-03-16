@@ -56,7 +56,8 @@ export default function App() {
 
         setData(`Scanned Tag UID: ${tag.id}`);
         // TODO: POST tag.id to our Next.js backend
-        await sendTagToBackend(tag.id);
+        const uid = typeof tag.id === 'string' ? tag.id : (tag.id ? tag.id.join('') : 'unknown');
+        await sendTagToBackend(uid);
       }
     } catch (ex) {
       console.warn('Error reading NFC', ex);
