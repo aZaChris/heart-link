@@ -68,10 +68,9 @@ export default function App() {
   };
 
   const sendTagToBackend = async (uid: string) => {
-    // NOTE: Replace with actual deployed backend URL or local IP
-    const BACKEND_URL = 'http://192.168.1.X:3000/api/scan';
+    // API URL to our live Vercel backend
+    const BACKEND_URL = 'https://heart-link-nine.vercel.app/api/scan';
     try {
-      /*
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,11 +79,10 @@ export default function App() {
       const result = await response.json();
       if (result.success) {
          setSyncedCount(prev => prev + 1);
+         Alert.alert("Heart Sent! ❤️", "Your partner has been notified.");
+      } else {
+         Alert.alert("Error", result.error || "Could not sync with server.");
       }
-      */
-      // Mock success for now
-      setSyncedCount(prev => prev + 1);
-      Alert.alert("Heart Sent! ❤️", "Your partner has been notified.");
     } catch (e) {
       Alert.alert("Error", "Could not sync with server.");
     }
