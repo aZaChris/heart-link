@@ -56,7 +56,7 @@ export default function App() {
 
         setData(`Scanned Tag UID: ${tag.id}`);
         // TODO: POST tag.id to our Next.js backend
-        const uid = typeof tag.id === 'string' ? tag.id : (tag.id ? tag.id.join('') : 'unknown');
+        const uid = tag.id ? tag.id : 'unknown';
         await sendTagToBackend(uid);
       }
     } catch (ex) {
