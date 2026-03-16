@@ -34,11 +34,18 @@ export default function App() {
     };
   }, []);
 
-  const handleUrl = (url: string) => {
+  const handleUrl = (url: string, isSimulated = false) => {
     const parsedUrl = Linking.parse(url);
     if (parsedUrl.path === 'scan') {
-      // Deep link intercepted! Now we must quickly read the NFC tag UID.
-      readNfcTagForDeepLink();
+      if (isSimulated) {
+        // Skip hardware NFC read and simulate directly
+        Vibration.vibrate([0, 100, 100, 100, 100, 800]); 
+        setData(`Scanned Tag UID: SIMULATED-TAG-123`);
+        sendTagToBackend('SIMULATED-TAG-123');
+      } else {
+        // Deep link intercepted! Now we must quickly read the real NFC tag UID.
+        readNfcTagForDeepLink();
+      }
     }
   };
 
@@ -106,7 +113,7 @@ export default function App() {
       <Button
         title="Simulate NFC Scan"
         color="#e91e63"
-        onPress={() => handleUrl('https://heartlink.app/scan')}
+        onPress={() => handleUrl('https://heartlink.app/scan', true)}
       />
     </View>
   );
