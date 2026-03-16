@@ -52,13 +52,22 @@
             "DEFAULT"
           ]
         }
-      ]
+      ],
+      "permissions": [
+        "android.permission.NFC"
+      ],
+      "package": "com.azachris.mobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "react-native-nfc-manager"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c951f4a4-548e-465b-a1e8-e0a1940a1839"
+      }
+    }
   }
 }
