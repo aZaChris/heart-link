@@ -1,12 +1,36 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { messaging } from '@/lib/firebase';
 
-// Helper function to simulate push notification to FCM
-async function sendPushNotification(partnerToken: string, title: string, body: string) {
-    // TODO: Replace with actual Firebase Admin FCM messaging
-    console.log(`Sending Push Notification to ${partnerToken}...`);
-    console.log(`Title: ${title}, Body: ${body}`);
-    return true;
+// Real function to send push notification via FCM
+async function sendPushNotification(partnerToken: string, title: string, body: string, senderName: string) {
+    try {
+        const message = {
+            notification: {
+                title: title,
+                body: body,
+            },
+            data: {
+                type: 'heart_scan',
+                sender_name: senderName,
+            },
+            token: partnerToken,
+            android: {
+                priority: 'high' as const,
+                notification: {
+                    sound: 'default',
+                    channelId: 'heartlink-notifs',
+                }
+            }
+        };
+
+        const response = await messaging.send(message);
+        console.log(`FCM Notification sent! Message ID: ${response}`);
+        return true;
+    } catch (error) {
+        console.error('Error sending FCM notification:', error);
+        return false;
+    }
 }
 
 export async function POST(request: Request) {
@@ -61,7 +85,8 @@ export async function POST(request: Request) {
             await sendPushNotification(
                 partner.fcm_token,
                 'HeartLink',
-                `${user.name || 'Your partner'} is thinking of you! ❤️`
+                `${user.name || 'Your partner'} is thinking of you! ❤️`,
+                user.name || 'Your partner'
             );
         }
 

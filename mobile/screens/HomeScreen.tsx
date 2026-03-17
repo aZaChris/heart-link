@@ -3,6 +3,17 @@ import { View, Text, StyleSheet, Button, Alert, ActivityIndicator, Vibration } f
 import * as Linking from 'expo-linking';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { supabase } from '../lib/supabase';
+import { registerForPushNotificationsAsync } from '../lib/notifications';
+import * as Notifications from 'expo-notifications';
+
+// Handle notifications while the app is open
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 // Initialize NFC safely
 NfcManager.isSupported().then((supported) => {
@@ -21,6 +32,10 @@ export default function HomeScreen({ route, navigation }: any) {
 
   // 1. Handle Deep Links (App is opened via NFC URL)
   useEffect(() => {
+    if (user) {
+        registerForPushNotificationsAsync(user.id);
+    }
+
     const getInitialURL = async () => {
       const url = await Linking.getInitialURL();
       if (url) {
@@ -33,10 +48,16 @@ export default function HomeScreen({ route, navigation }: any) {
       handleUrl(event.url);
     });
 
+    // Handle notifications when app is in foreground
+    const notificationSubscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification Received in Foreground:', notification);
+    });
+
     return () => {
       subscription.remove();
+      notificationSubscription.remove();
     };
-  }, []);
+  }, [user]);
 
   const handleUrl = (url: string, isSimulated = false) => {
     const parsedUrl = Linking.parse(url);

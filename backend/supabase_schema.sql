@@ -2,17 +2,57 @@
 
 -- Users table
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY REFERENCES auth.users(id), -- Link directly to Supabase Auth
     email TEXT UNIQUE NOT NULL,
     name TEXT,
-    code TEXT UNIQUE NOT NULL, -- Unique partner linking code
+    code TEXT UNIQUE NOT NULL DEFAULT substring(md5(random()::text) from 1 for 6), -- Temporary default, better handled by trigger
     partner_id UUID REFERENCES users(id),
-    fcm_token TEXT, -- Firebase Cloud Messaging token for push notifications
+    fcm_token TEXT,
     total_scans INTEGER DEFAULT 0,
     current_streak INTEGER DEFAULT 0,
     last_scan_date DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Function to generate a random 6-character alphanumeric code
+CREATE OR REPLACE FUNCTION generate_unique_code() 
+RETURNS TEXT AS $$
+DECLARE
+    new_code TEXT;
+    done BOOL;
+BEGIN
+    done := false;
+    WHILE NOT done LOOP
+        new_code := upper(substring(md5(random()::text) from 1 for 6));
+        LOCK TABLE users IN EXCLUSIVE MODE; -- Prevent race conditions
+        IF NOT EXISTS (SELECT 1 FROM users WHERE code = new_code) THEN
+            done := true;
+        END IF;
+    END LOOP;
+    RETURN new_code;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger function to handle new user creation from Supabase Auth
+CREATE OR REPLACE FUNCTION public.handle_new_user() 
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.users (id, email, name, code)
+  VALUES (
+    new.id, 
+    new.email, 
+    new.raw_user_meta_data->>'full_name', 
+    generate_unique_code()
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to execute on signup
+-- DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+-- CREATE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- Scans history table
 CREATE TABLE scans (
