@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { messaging } from '@/lib/firebase';
+import { getMessaging } from '@/lib/firebase';
 
 // Real function to send push notification via FCM
 async function sendPushNotification(partnerToken: string, title: string, body: string, senderName: string) {
@@ -23,6 +23,12 @@ async function sendPushNotification(partnerToken: string, title: string, body: s
                 }
             }
         };
+
+        const messaging = getMessaging();
+        if (!messaging) {
+            console.warn('FCM messaging not initialized, skipping notification');
+            return false;
+        }
 
         const response = await messaging.send(message);
         console.log(`FCM Notification sent! Message ID: ${response}`);
