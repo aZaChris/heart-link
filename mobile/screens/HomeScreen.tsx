@@ -8,10 +8,12 @@ import * as Notifications from 'expo-notifications';
 
 // Handle notifications while the app is open
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
+  handleNotification: async (_notification: Notifications.Notification) => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -49,7 +51,7 @@ export default function HomeScreen({ route, navigation }: any) {
     });
 
     // Handle notifications when app is in foreground
-    const notificationSubscription = Notifications.addNotificationReceivedListener(notification => {
+    const notificationSubscription = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
       console.log('Notification Received in Foreground:', notification);
     });
 
