@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Button, ActivityIndicator, Alert, TextInput, TouchableOpacity } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function LinkPartnerScreen({ route, navigation }: any) {
   const [loading, setLoading] = useState(false);
@@ -16,19 +15,25 @@ export default function LinkPartnerScreen({ route, navigation }: any) {
   const fetchMyCode = async () => {
     if (!user) return;
     
-    // In a real app we'd fetch or generate checking the users table
+    console.log('Fetching code for user ID:', user.id);
     const { data, error } = await supabase
       .from('users')
       .select('code, partner_id')
       .eq('id', user.id)
       .single();
       
+    if (error) {
+      console.error('Supabase error fetching code:', error);
+    }
+
     if (data) {
+      console.log('User data found:', data);
       setMyCode(data.code);
       if (data.partner_id) {
-         // Already linked
          navigation.replace('Home');
       }
+    } else {
+      console.log('No user data found in public.users for ID:', user.id);
     }
   };
 
@@ -62,10 +67,13 @@ export default function LinkPartnerScreen({ route, navigation }: any) {
     <View style={styles.container}>
       <Text style={styles.title}>Link Your Partner</Text>
       
-      <View style={styles.card}>
+      <TouchableOpacity 
+        onLongPress={() => Alert.alert("Debug Info", `User ID: ${user?.id}`)} 
+        style={styles.card}
+      >
          <Text style={styles.label}>Your Code:</Text>
          <Text style={styles.code}>{myCode}</Text>
-      </View>
+      </TouchableOpacity>
 
       <Text style={styles.or}>OR</Text>
 
